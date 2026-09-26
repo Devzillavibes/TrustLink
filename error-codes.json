@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-31T09:56:47.000Z",
+  "generated": "2026-09-26T21:48:06.858Z",
   "source": "src/errors.rs",
   "errors": [
     {
@@ -236,6 +236,11 @@
       "code": 47,
       "name": "VersionMismatch",
       "description": "The caller's `expected_version` argument does not match the contract's currently deployed version, as returned by `get_version()`. Returned by state-changing entry points that opt into the version-guard pattern documented on [`crate::validation::Validation::require_version_match`]."
+    },
+    {
+      "code": 48,
+      "name": "NotImplemented",
+      "description": "Feature not yet implemented."
     }
   ]
 }
