@@ -62,6 +62,7 @@
 //! [`TrustLinkError::Contract`] with a typed [`ContractErrorCode`].
 
 pub mod client;
+pub mod generated;
 pub mod rpc;
 pub mod types;
 pub mod xdr;

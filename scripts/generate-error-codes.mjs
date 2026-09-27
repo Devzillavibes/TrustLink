@@ -7,6 +7,7 @@
  *   2. sdk/typescript/src/generated/error-codes.ts  — consumed by the TS SDK
  *   3. bindings/typescript/src/generated/error-codes.ts — consumed by TS bindings
  *   4. bindings/python/trustlink/generated_error_codes.py — consumed by Python SDK
+ *   5. bindings/rust/src/generated/error_codes.rs — consumed by the Rust bindings
  *
  * Usage:
  *   node scripts/generate-error-codes.mjs
@@ -28,6 +29,7 @@ const JSON_OUT = resolve(ROOT, "error-codes.json");
 const TS_SDK_OUT = resolve(ROOT, "sdk", "typescript", "src", "generated", "error-codes.ts");
 const TS_BINDINGS_OUT = resolve(ROOT, "bindings", "typescript", "src", "generated", "error-codes.ts");
 const PY_OUT = resolve(ROOT, "bindings", "python", "trustlink", "generated_error_codes.py");
+const RS_OUT = resolve(ROOT, "bindings", "rust", "src", "generated", "error_codes.rs");
 
 // ---------------------------------------------------------------------------
 // Parse src/errors.rs
@@ -157,6 +159,73 @@ function emitPython(errors, outPath) {
   console.log(`✅ Wrote ${outPath}`);
 }
 
+function emitRust(errors, outPath) {
+  mkdirSync(dirname(outPath), { recursive: true });
+
+  const variants = errors
+    .map((e) => {
+      const doc = e.description ? `    /// ${e.description}\n` : "";
+      return `${doc}    ${e.name} = ${e.code},`;
+    })
+    .join("\n");
+
+  const fromArms = errors.map((e) => `            ${e.code} => Self::${e.name},`).join("\n");
+
+  const content = `//! GENERATED FILE — DO NOT EDIT BY HAND.
+//!
+//! Run \`node scripts/generate-error-codes.mjs\` (or \`make generate\`) to regenerate.
+//! Source of truth: src/errors.rs
+
+use serde::{Deserialize, Serialize};
+
+/// Contract-level error codes that map directly to the on-chain \`Error\` enum.
+///
+/// \`Unknown\` is not a contract error: it is the fallback for a code this
+/// binding does not recognise, which happens when the contract adds a variant
+/// before the bindings are regenerated.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[repr(u32)]
+pub enum ContractErrorCode {
+${variants}
+    /// Unrecognised contract error code.
+    Unknown = 99,
+}
+
+impl From<u32> for ContractErrorCode {
+    fn from(code: u32) -> Self {
+        match code {
+${fromArms}
+            _ => Self::Unknown,
+        }
+    }
+}
+
+impl ContractErrorCode {
+    /// The numeric code as reported by the contract.
+    pub fn code(self) -> u32 {
+        self as u32
+    }
+
+    /// The variant name, matching the contract\'s \`Error\` enum.
+    pub fn name(self) -> &\'static str {
+        match self {
+${errors.map((e) => `            Self::${e.name} => "${e.name}",`).join("\n")}
+            Self::Unknown => "Unknown",
+        }
+    }
+}
+
+impl core::fmt::Display for ContractErrorCode {
+    fn fmt(&self, f: &mut core::fmt::Formatter<\'_>) -> core::fmt::Result {
+        write!(f, "{} (#{})", self.name(), self.code())
+    }
+}
+`;
+
+  writeFileSync(outPath, content);
+  console.log(`✅ Wrote ${outPath}`);
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -172,5 +241,6 @@ emitJson(errors);
 emitTypeScript(errors, TS_SDK_OUT);
 emitTypeScript(errors, TS_BINDINGS_OUT);
 emitPython(errors, PY_OUT);
+emitRust(errors, RS_OUT);
 
 console.log(`\n✨ Done. ${errors.length} error codes synchronized across all clients.`);

@@ -105,48 +105,10 @@ pub struct MultiSigProposal {
 
 // ─── Errors ───────────────────────────────────────────────────────────────────
 
-/// Contract-level error codes that map directly to the on-chain `Error` enum.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[repr(u32)]
-pub enum ContractErrorCode {
-    AlreadyInitialized = 1,
-    NotInitialized = 2,
-    Unauthorized = 3,
-    NotFound = 4,
-    DuplicateAttestation = 5,
-    AlreadyRevoked = 6,
-    Expired = 7,
-    InvalidInput = 8,
-    LimitExceeded = 10,
-    InvalidThreshold = 11,
-    NotRequiredSigner = 12,
-    AlreadySigned = 13,
-    ProposalFinalized = 14,
-    ProposalExpired = 15,
-    Unknown = 99,
-}
-
-impl From<u32> for ContractErrorCode {
-    fn from(code: u32) -> Self {
-        match code {
-            1 => Self::AlreadyInitialized,
-            2 => Self::NotInitialized,
-            3 => Self::Unauthorized,
-            4 => Self::NotFound,
-            5 => Self::DuplicateAttestation,
-            6 => Self::AlreadyRevoked,
-            7 => Self::Expired,
-            8 => Self::InvalidInput,
-            10 => Self::LimitExceeded,
-            11 => Self::InvalidThreshold,
-            12 => Self::NotRequiredSigner,
-            13 => Self::AlreadySigned,
-            14 => Self::ProposalFinalized,
-            15 => Self::ProposalExpired,
-            _ => Self::Unknown,
-        }
-    }
-}
+// `ContractErrorCode` is generated from `src/errors.rs` so the binding cannot
+// drift from the contract's error table. Re-exported here to keep
+// `trustlink::types::ContractErrorCode` working for existing callers.
+pub use crate::generated::error_codes::ContractErrorCode;
 
 /// Client-level error wrapping both transport and contract errors.
 #[derive(Debug, thiserror::Error)]
