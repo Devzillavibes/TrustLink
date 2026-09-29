@@ -65,6 +65,8 @@ backup:
 
   # Local storage (requires PVC)
   localPath: /backups
+  pvcSize: 10Gi # Size of the backup PVC created when storage=local
+  storageClassName: "" # Optional; uses the cluster default if empty
 
   # S3 configuration
   s3Bucket: "" # Required if storage=s3
