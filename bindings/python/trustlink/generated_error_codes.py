@@ -38,5 +38,22 @@ CONTRACT_ERRORS: Dict[int, str] = {
     28: "RateLimited",  # Issuer has exceeded the minimum issuance interval (rate limit).
     29: "LimitExceeded",  # Storage limit exceeded for issuer or subject.
     30: "ProposalCancelled",  # The proposal has been cancelled by the proposer.
+    31: "AlreadyDisputed",  # Dispute has already been raised for this attestation.
+    32: "InvalidMetadata",  # Metadata does not match required format or constraints.
+    33: "ConstraintViolation",  # Constraint violation for claim type.
+    34: "RequestAlreadyProcessed",  # Request has already been processed.
+    35: "RequestExpired",  # Request has expired.
+    36: "DuplicateRequest",  # Duplicate request.
+    37: "CouncilProposalExecuted",  # Council proposal has already been executed.
+    38: "TimelockNotReady",  # Timelock period has not elapsed yet.
+    39: "NotDisputed",  # Attestation is not disputed.
+    40: "LastAdminCannotBeRemoved",  # Cannot remove the last admin.
+    41: "InvalidFeeToken",  # Invalid fee token.
+    42: "CannotDelegateToSelf",  # Cannot delegate to self.
+    43: "AlreadyApproved",  # Already approved.
     44: "InvalidSourceReference",  # Source reference string is missing or empty.
+    45: "InvalidChunkSize",  # `chunk_size` passed to `set_chunk_size` is 0 or otherwise out of range.
+    46: "NotRegisteredClaimType",  # Claim type is not in the registry when registration is required.
+    47: "VersionMismatch",  # The caller's `expected_version` argument does not match the contract's currently deployed version, as returned by `get_version()`. Returned by state-changing entry points that opt into the version-guard pattern documented on [`crate::validation::Validation::require_version_match`].
+    48: "NotImplemented",  # Feature not yet implemented.
 }

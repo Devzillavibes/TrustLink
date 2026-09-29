@@ -465,11 +465,13 @@ pub fn get_expiring_attestations(
     // Sort by expiration ascending using insertion sort (O(n²) worst case, efficient in practice)
     let len = filtered.len();
     for i in 1..len {
-        let key = filtered.get(i).unwrap();
+        // Invariant: i is in [1, len), so it is always a valid index into `filtered`.
+        let key = filtered.get(i).expect("i is bounded by filtered.len()");
         let key_exp = key.expiration.unwrap_or(u64::MAX);
         let mut j = i;
         while j > 0 {
-            let prev = filtered.get(j - 1).unwrap();
+            // Invariant: j > 0 and j <= i < len, so j - 1 is always a valid index.
+            let prev = filtered.get(j - 1).expect("j - 1 is bounded by filtered.len()");
             let prev_exp = prev.expiration.unwrap_or(u64::MAX);
             if prev_exp <= key_exp {
                 break;
@@ -532,11 +534,13 @@ pub fn get_issuer_expiring_attestations(
     // Sort by expiration ascending using insertion sort (O(n²) worst case, efficient in practice)
     let len = filtered.len();
     for i in 1..len {
-        let key = filtered.get(i).unwrap();
+        // Invariant: i is in [1, len), so it is always a valid index into `filtered`.
+        let key = filtered.get(i).expect("i is bounded by filtered.len()");
         let key_exp = key.expiration.unwrap_or(u64::MAX);
         let mut j = i;
         while j > 0 {
-            let prev = filtered.get(j - 1).unwrap();
+            // Invariant: j > 0 and j <= i < len, so j - 1 is always a valid index.
+            let prev = filtered.get(j - 1).expect("j - 1 is bounded by filtered.len()");
             let prev_exp = prev.expiration.unwrap_or(u64::MAX);
             if prev_exp <= key_exp {
                 break;
@@ -588,6 +592,8 @@ pub fn dispute_attestation(
         return Err(E::MetadataTooLong);
     }
 
+    Validation::require_not_paused(env)?;
+
     let timestamp = env.ledger().timestamp();
     let record = DisputeRecord {
         attestation_id: attestation_id.clone(),
@@ -606,7 +612,7 @@ pub fn dispute_attestation(
 /// to check revocation status for many attestations at once without individually
 /// querying each one. Supports two formats:
 /// - `RevocationListFormat::SimpleList`: Simple list of revoked attestation IDs
-/// - `RevocationListFormat::Bitstring`: Compact bitstring encoding (Status List 2021 compatible)
+/// - `RevocationListFormat::Bitstring`: Reserved for bitstring encoding (returns `None` for now)
 ///
 /// # Parameters
 /// - `issuer` — the issuer address whose revocations to export
@@ -669,15 +675,8 @@ pub fn export_revocation_list(
     // Generate bitstring if requested
     let bitstring = match format {
         RevocationListFormat::Bitstring => {
-            // Create bitstring: sort IDs lexicographically for deterministic encoding
-            let mut sorted_ids: Vec<String> = Vec::new(env);
-            for id in revoked_ids.iter() {
-                sorted_ids.push_back(id.clone());
-            }
-
-            // Simple approach: return sorted IDs list (bitstring compression can be added later)
-            // For a true bitstring, we'd need to map positions to IDs
-            None // Simple implementation - bitstring can be added as optimization
+            // Bitstring encoding not yet implemented
+            return Err(Error::NotImplemented);
         }
         RevocationListFormat::SimpleList => None,
     };
