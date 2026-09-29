@@ -55,6 +55,12 @@ variable "indexer_image" {
 variable "indexer_port" {
   description = "Port the indexer container listens on"
   type        = number
+  default     = 3000
+}
+
+variable "gql_port" {
+  description = "Port the indexer GraphQL/WS server listens on"
+  type        = number
   default     = 4000
 }
 

@@ -14,6 +14,9 @@ databaseUrl: ""
 # HTTP port for the REST API (maps to PORT)
 port: 3000
 
+# HTTP/WS port for the GraphQL API (maps to GQL_PORT)
+gqlPort: 4000
+
 # Required: deployed TrustLink contract ID
 contractId: ""
 
@@ -28,6 +31,7 @@ redisUrl: "redis://localhost:6379"
 service:
   type: ClusterIP
   port: 3000
+  graphqlPort: 4000
 
 resources: {}
 
