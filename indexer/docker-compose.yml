@@ -38,7 +38,6 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://trustlink:trustlink@db:5432/trustlink
-      REDIS_URL: redis://redis:6379
       CONTRACT_ID: ${CONTRACT_ID}
       RPC_URL: ${RPC_URL:-https://soroban-testnet.stellar.org}
       GENESIS_LEDGER: ${GENESIS_LEDGER:-0}
